@@ -46,37 +46,50 @@ namespace Sudzy;
 
 class Engine
 {
-    protected $_checks = array( //Validation methods are stored here so they can easily be overwritten
+    /**
+    * Validation methods are stored here so they can easily be overwritten
+    */
+    protected $_checks = array( 
         'required' => array($this, '_required')
     );
 
-    public __call($name, $args) {
+    public __call($name, $args) 
+    {
         if (!isset($this->_checks[$name])) return; // TODO: Throw error if missing?
         $val = array_shift($args);
         call_user_func(__NAMESPACE__.'\Engine::'.$this->_checks[$name], $val, $args);
     }
 
-    public function executeOne($check, $val, $params=array()) {
+    public function executeOne($check, $val, $params=array())
+    {
         return $this->$check($val, $params);
     }
 
-    public function addValidator($label, $function) {
+    /**
+    * @param string label used to call function
+    * @param Callable function with params (value, additional params as array)
+    */
+    public function addValidator($label, $function)
+    {
         if (isset($this->_checks[$label])) throw Exception();
         $this->setValidator($label, $function);
     }
 
-    public function setValidator($label, $function) {
+    public function setValidator($label, $function)
+    {
         $this->_checks[$label] = $function;
     }
 
-    public function removeValidator($label) {
+    public function removeValidator($label)
+    {
         unset($this->_checks[$label]);
     }
 
     /**
     * @return string The list of usable validator methods
     */
-    public function getValidators() {
+    public function getValidators()
+    {
         return array_keys($this->checks);
     }
 
