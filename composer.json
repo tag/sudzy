@@ -1,5 +1,5 @@
 {
-    "name": "Sudzy",
+    "name": "tag/sudzy",
     "description": "Model validator for use with Paris (and Idiorm).",
     "version": "0.0.1",
     "keywords": ["validator", "model","idiorm", "paris"],
