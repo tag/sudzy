@@ -1,0 +1,27 @@
+{
+    "name": "alttag/sudzy",
+    "description": "Model validator for use with Paris (and Idiorm).",
+    "keywords": ["validator", "model","idiorm", "paris"],
+    "homepage": "https://github.com/tag/sudzy",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "Tom Gregory",
+            "email": "tom@alt-tag.com",
+            "homepage": "http://alt-tag.com/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.2.0",
+        "kevinsperrine/paris": ">=2.0.0"
+        "kevinsperrine/idiorm": ">=2.0.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "OrmWrapper": "src/",
+            "Paris": "src/",
+            "Model": "src/"
+        }
+    }
+}
