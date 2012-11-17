@@ -1,13 +1,11 @@
 <?php
 namespace Sudzy;
 
-abstract class ValidModel extends \Slim\Model
+class ValidModel extends \Model
 {
     protected $_validator        = null;    // Reference to Sudzy validator object
     protected $_validations      = array(); // Array of validations
     protected $_validationErrors = array(); // Array of error messages
-
-    abstract public function prepareValidations($arr); //MUST call $this->prepareValidationEngine();
 
     public function addValidation($field, $validations, $message) {
         if (!isset($this->_validations[$field])) {
@@ -24,12 +22,12 @@ abstract class ValidModel extends \Slim\Model
     */
     public function validate()
     {
-        $fields = array_keys($this->validations);
+        $fields = array_keys($this->_validations);
         $success = true;
         foreach ($fields as $f) {
             $success = $success && $this->validateField($f);
         }
-        reurn $success;
+        return $success;
     }
 
     /**
@@ -54,7 +52,7 @@ abstract class ValidModel extends \Slim\Model
                     $params = explode('|', $check);
                     $check  = array_shift($params);
                     $localSuccess = $localSuccess
-                        && $this->_validator->executeOne($check, $this->$field, $params) {
+                        && $this->_validator->executeOne($check, $this->$field, $params);
                 }
                 if (!$localSuccess) {
                     $this->addValidationError($v['message']);
@@ -75,11 +73,10 @@ abstract class ValidModel extends \Slim\Model
     */
     public function save()
     {
-        if (!empty($this->_validations)) {
-            if (!$this->validate()) {
-                //$this->doValidationError();
-                throw new ValidationException();
-                return false;
+        if (!$this->validate()) {
+            //throw new ValidationException(); // TODO: Add custome exception
+            throw new Exception();
+            return false;
         }
         parent::save();
     }
@@ -87,22 +84,8 @@ abstract class ValidModel extends \Slim\Model
     ////////////////////
     // Protected methods
 
-    protected function addValidationError($msg) {
+    protected function addValidationError($msg) 
+    {
         $this->_validationErrors[] = $msg;
     }
 }
-
-
-
-
-$this->validator->addValidator('custom1', function ($f) {return trim($f) === trim($field2);});
-
-$this->addValidation('email', 'required email', 'A valid email address is required');
-$this->addValidation('password', 'minLen|6', 'Password must be at least 6 characters');
-
-// $this->validator->prepare(array(
-//  'field1' => 'required minChars(5)',
-//  'field2' => array(checks=>'required email', 'name'=>'Email Address'),
-//  'field2' => 'custom1'
-// ));
-
