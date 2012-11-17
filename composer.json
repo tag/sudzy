@@ -23,6 +23,6 @@
         "kevinsperrine/idiorm": ">=2.0.0"
     },
     "autoload": {
-            "psr-0": {"Sudzy": "src/"}
+            "psr-0": {"Sudzy": "."}
     }
 }
