@@ -14,8 +14,8 @@
         }
     ],
     "repository": {
-        "type": "git",
-        "url": "https://github.com/tag/sudzy.git"
+        "type": "vcs",
+        "url": "https://github.com/tag/sudzy"
     },
     "require": {
         "php": ">=5.3.0",
