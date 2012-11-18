@@ -17,42 +17,49 @@ class ValidModel extends \Model
         );
     }
 
-    /**
-    * @return bool If false, running $this->doValidationError() will respond appropriately
-    */
-    public function validate()
-    {
-        $fields = array_keys($this->_validations);
-        $success = true;
-        foreach ($fields as $f) {
-            $success = $success && $this->validateField($f);
-        }
-        return $success;
-    }
+    // /**
+    // * @return bool If false, running $this->doValidationError() will respond appropriately
+    // */
+    // public function validate()
+    // {
+    //     $fields = array_keys($this->_validations);
+    //     $success = true;
+    //     foreach ($fields as $f) {
+    //         $success = $success && $this->validateField($f, $this->$f);
+    //     }
+    //     return $success;
+    // }
 
     /**
+    * @throws BadArumentException if field is not a valid property of the object
     * @return bool Will set a message if returning false
     **/
-    public function validateField($field)
+    public function validateField($field, $value)
     {
         if (null == $this->_validator) $this->_validator = new \Sudzy\Engine(); // Is lazy setup worth it?
 
         if (!isset($this->_validations[$field])) {
             if (!isset($this->$field)) {
-                throw new BadArgumentException("{$field} is not a valid property of object.");
+                throw new \InvalidArgumentException("{$field} is not a valid property of object.");
             }
-            return true; // No validations, return true
+
+            return true; // No validations, return true by default
         }
 
         $success = true;
         foreach ($this->_validations[$field] as $v) {
-                $checks = explode(' ', $v['validation']);
+                $checks = explode(' ', $v['validations']);
                 $localSuccess = true;
                 foreach ($checks as $check) {
+$_SESSION['debug'][] = "  ...validateField : {$check}";
                     $params = explode('|', $check);
                     $check  = array_shift($params);
+$_SESSION['debug'][] = "  ...validateField : {$check} " .print_r( $params, true);
+
                     $localSuccess = $localSuccess
-                        && $this->_validator->executeOne($check, $this->$field, $params);
+                        && $this->_validator->executeOne($check, $value, $params);
+$_SESSION['debug'][] = "  ...validateField : {$check} : " .($localSuccess ? 'pass' : 'fail');
+//$app->getLog()->debug("  ...validateField : {$check} : " .($localSuccess ? 'pass' : 'fail'));
                 }
                 if (!$localSuccess) {
                     $this->addValidationError($v['message']);
@@ -65,27 +72,40 @@ class ValidModel extends \Model
     public function getValidationErrors()
     {
         return $this->_validationErrors;
-        //return $this->_validator->getErrors();
     }
 
     /**
-    * Overrides parent::save
+    * Overload __set to call validateAndSet
     */
-    public function save()
-    {
-        if (!$this->validate()) {
-            //throw new ValidationException(); // TODO: Add custome exception
-            throw new Exception();
-            return false;
-        }
-        parent::save();
+    public function __set($name, $value) {
+        $this->validateAndSet($name, $value);
     }
+
+    /**
+    * Overload set; to call validateAndSet
+    */
+    public function set($name, $value) {
+        $this->validateAndSet($name, $value);
+    }
+
 
     ////////////////////
     // Protected methods
+    protected function doValidationError() {
+        throw new ValidationException($this->_validationErrors); // TODO: Update to give option of silent failure
+    }
 
     protected function addValidationError($msg) 
     {
         $this->_validationErrors[] = $msg;
+    }
+
+    /**
+    * Overload set; to call validateAndSet
+    */
+    protected function validateAndSet($name, $value)
+    {
+        if (!$this->validateField($name, $value)) $this->doValidationError();
+        parent::set($name, $value);
     }
 }

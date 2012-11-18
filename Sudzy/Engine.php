@@ -2,62 +2,28 @@
 
 namespace Sudzy;
 
-// class Sudzy
-// {
-//     protected $_options = array (
-//         'throw'     => false,
-// //      'checkAll'  => 'true',  // false: fail on first
-//         'engine'    => __NAMESPACE__.'\\Engine'
-//     );
-// 
-//     protected $_errors = array();
-// 
-//     protected $engine;
-// 
-//     __construct($options = array()) {
-//         $this->setOptions($options);
-//     }
-// 
-//     public function setOptions($options) {
-//         $this->_options = array_merge($this->_options,  $options);
-//     }
-// 
-//     /**
-//     *
-//     * @param array of validations, where each validation is [check, value, array of additional parameters, optional error message]
-//     */
-//     public function execute($arr) {
-//         $this->_errors = array();
-//         foreach ($arr as $validation) {
-//             $check = array_shift($validation);
-//             $value = array_shift($validation);
-// 
-//             if (!$this->engine->executeOne($check, $value, $params=array())) {
-//                 $this->_errors[] = $this->prepareMessage($check, $value, $params) ;
-//                 if (!$this->_options['checkAll']) {
-//                     if ($this->_options['throw']) throw new ValidationException($msg);
-//                     return false;
-//                 }
-//             }
-//         }
-//         return empty($this->_errors);
-//     }
-// }
-
 class Engine
 {
     /**
     * Validation methods are stored here so they can easily be overwritten
     */
-    protected $_checks = array( 
-        'required' => array($this, '_required')
-    );
+    protected $_checks;
 
-    public __call($name, $args) 
+    public function __construct()
     {
-        if (!isset($this->_checks[$name])) return; // TODO: Throw error if missing?
+        $this->_checks = array(
+            'required'  => array($this, '_required'),
+            'minLength' => array($this, '_minLength')
+        );
+    }
+
+    public function __call($name, $args) 
+    {
+        if (!isset($this->_checks[$name])) 
+            throw new \InvalidArgumentException("{$name} is not a valid validation function.");
+        //return; // TODO: Throw error if missing?
         $val = array_shift($args);
-        call_user_func(__NAMESPACE__.'\Engine::'.$this->_checks[$name], $val, $args);
+        call_user_func($this->_checks[$name], $val, $args); //__NAMESPACE__.'\Engine::'.
     }
 
     public function executeOne($check, $val, $params=array())
@@ -94,8 +60,14 @@ class Engine
     }
 
     ///// Validator methods
-    protected function _required($val, $params=array()) {
-        return $val !=== null && trim($val)!==="";
+    protected function _required($val, $params=array())
+    {
+        return (($val !== null) && ('' !== trim($val)));
+    }
+
+    protected function _minLength($val, $params)
+    {
+        $len = array_shift($params);
+        return strlen($val)>=$len;
     }
 }
-
