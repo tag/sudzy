@@ -1,7 +1,7 @@
 # Sudzy
 **Currently an evolving work-in-progress.**
 
-Sudzy is a collection of validator classes, currently intended for use with Paris/Idiorm (an active record ORM used with Slim), although is could be adapted easily.
+Sudzy is a collection of validator classes, currently intended for use with Paris/Idiorm (an active record ORM used with Slim), although it could be adapted easily.
 
 The core validation engine contains only validation functions, which can be extended or overwritten. Validation functions return only booleans.
 
@@ -39,8 +39,8 @@ class User extends \Sudzy\ValidModel
         $this->validator->addValidator('customIsTrimmed', function ($val, $params) {return trim($val) === $val;});
 
         // Add validation tests for model fields
-        $this->addValidation('email', 'required email', 'A valid email address is required');
-        $this->addValidation('password', 'minLen|6', 'Password must be at least 6 characters');
+        $this->addValidation('email', 'required email', 'A valid email address is required.');
+        $this->addValidation('password', 'minLen|6', 'Password must be at least 6 characters.');
     }
 }
 ```
