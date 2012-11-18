@@ -23,6 +23,9 @@
         "kevinsperrine/idiorm": ">=2.0.0"
     },
     "autoload": {
-            "psr-0": {"Sudzy": "."}
+            "psr-0": {
+                "Sudzy": ".",
+                "ValidationException": "Sudzy"
+            }
     }
 }
