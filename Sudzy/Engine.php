@@ -14,7 +14,7 @@ class Engine
         $this->_checks = array(
             'required'  => array($this, '_required'),
             'minLength' => array($this, '_minLength'),
-            'isEmail'   => array($htis, '_isEmail')
+            'isEmail'   => array($this, '_isEmail')
         );
     }
 
@@ -24,12 +24,14 @@ class Engine
             throw new \InvalidArgumentException("{$name} is not a valid validation function.");
 
         $val = array_shift($args);
+        $args = array_shift($args);
+
         return call_user_func($this->_checks[$name], $val, $args);
     }
 
     public function executeOne($check, $val, $params=array())
     {
-        return $this->$check($val, $params);
+        return call_user_func(__NAMESPACE__ .'\Engine::'.$check, $val, $params);
     }
 
     /**
@@ -69,7 +71,7 @@ class Engine
     protected function _minLength($val, $params)
     {
         $len = array_shift($params);
-        return strlen($val)>=$len;
+        return strlen($val) >= $len;
     }
 
     protected function _required($val, $params=array())
