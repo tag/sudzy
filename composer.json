@@ -18,7 +18,9 @@
         "url": "https://github.com/tag/sudzy"
     },
     "require": {
-        "php": ">=5.3.0",
+        "php": ">=5.3.0"
+    },
+    "suggest": {
         "kevinsperrine/paris": ">=2.0.0",
         "kevinsperrine/idiorm": ">=2.0.0"
     },
