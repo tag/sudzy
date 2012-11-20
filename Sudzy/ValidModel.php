@@ -6,6 +6,21 @@ class ValidModel extends \Model
     protected $_validator        = null;    // Reference to Sudzy validator object
     protected $_validations      = array(); // Array of validations
     protected $_validationErrors = array(); // Array of error messages
+    protected $_validationOptions = array(
+        'throw' => self::ON_SAVE // One of self::ON_SET|ON_SAVE|NEVER. 
+                                  //  + ON_SET throws immediately when field is set()
+                                  //  + ON_SAVE throws on save()
+                                  //  + NEVER means an exception is never thrown; check for ->getValidaionErrors()
+    );
+
+    const ON_SET   = 'set';
+    const ON_SAVE  = 'save';
+    const NEVER    = null;
+
+    public function setValidationOptions($options)
+    {
+        $this->$_validationOptions = array_merge($this->_validationOptions, $options);
+    }
 
     public function addValidation($field, $validations, $message) {
         if (!isset($this->_validations[$field])) {
@@ -31,7 +46,6 @@ class ValidModel extends \Model
     // }
 
     /**
-    * @throws BadArumentException if field is not a valid property of the object
     * @return bool Will set a message if returning false
     **/
     public function validateField($field, $value)
@@ -39,10 +53,6 @@ class ValidModel extends \Model
         if (null == $this->_validator) $this->_validator = new \Sudzy\Engine(); // Is lazy setup worth it?
 
         if (!isset($this->_validations[$field])) {
-            if (!isset($this->$field)) {
-                throw new \InvalidArgumentException("{$field} is not a valid property of object.");
-            }
-
             return true; // No validations, return true by default
         }
 
@@ -69,6 +79,9 @@ class ValidModel extends \Model
         return $this->_validationErrors;
     }
 
+    ///////////////////
+    // Overloaded methods
+
     /**
     * Overload __set to call validateAndSet
     */
@@ -77,17 +90,30 @@ class ValidModel extends \Model
     }
 
     /**
-    * Overload set; to call validateAndSet
+    * Overload save; checks if errors exist before saving
     */
-    public function set($name, $value) {
+    public function save() {
+        $errs = $this->getValidationErrors();
+        if (!empty($errs))
+            $this->doValidationError(self::ON_SAVE);
+
+        parent::save();
+    }
+
+    /**
+    * Overload set; to call validateAndSet
+    * // TODO: handle multiple sets if $name is a field=>val array
+    */
+    public function set($name, $value = null) {
         $this->validateAndSet($name, $value);
     }
 
 
     ////////////////////
     // Protected methods
-    protected function doValidationError() {
-        throw new \ValidationException($this->_validationErrors); // TODO: Update to give option of silent failure
+    protected function doValidationError($context) {
+        if ($context == $this->_validationOptions['throw'])
+                throw new \ValidationException($this->_validationErrors);
     }
 
     protected function addValidationError($msg) 
@@ -100,7 +126,7 @@ class ValidModel extends \Model
     */
     protected function validateAndSet($name, $value)
     {
-        if (!$this->validateField($name, $value)) $this->doValidationError();
+        if (!$this->validateField($name, $value)) $this->doValidationError(self::ON_SET);
         parent::set($name, $value);
     }
 }
