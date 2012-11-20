@@ -52,5 +52,5 @@ class User extends \Sudzy\ValidModel
 ```
 ## Validator Methods
 + required
-+ email
++ isEmail
 + minLength accepts a length parameter; Implies required.
