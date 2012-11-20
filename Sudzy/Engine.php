@@ -13,7 +13,8 @@ class Engine
     {
         $this->_checks = array(
             'required'  => array($this, '_required'),
-            'minLength' => array($this, '_minLength')
+            'minLength' => array($this, '_minLength'),
+            'isEmail'   => array($htis, '_isEmail')
         );
     }
 
@@ -21,9 +22,9 @@ class Engine
     {
         if (!isset($this->_checks[$name])) 
             throw new \InvalidArgumentException("{$name} is not a valid validation function.");
-        //return; // TODO: Throw error if missing?
+
         $val = array_shift($args);
-        call_user_func($this->_checks[$name], $val, $args); //__NAMESPACE__.'\Engine::'.
+        return call_user_func($this->_checks[$name], $val, $args);
     }
 
     public function executeOne($check, $val, $params=array())
@@ -60,14 +61,19 @@ class Engine
     }
 
     ///// Validator methods
-    protected function _required($val, $params=array())
+    protected function _isEmail($val, $params)
     {
-        return (($val !== null) && ('' !== trim($val)));
+        return FALSE !== filter_var($val, FILTER_VALIDATE_EMAIL);
     }
 
     protected function _minLength($val, $params)
     {
         $len = array_shift($params);
         return strlen($val)>=$len;
+    }
+
+    protected function _required($val, $params=array())
+    {
+        return !(($val === null) || ('' === trim($val)));
     }
 }
