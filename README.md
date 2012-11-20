@@ -5,9 +5,15 @@ Sudzy is a collection of validator classes, currently intended for use with Pari
 
 The core validation engine contains only validation functions, which can be extended or overwritten. Validation functions return only booleans.
 
-When wrapping the ORM by extending its `Model` class, Sudzy's `ValidModel` does validation checks whenever properties are set. A failed validation throws a `ValidationError`.
+When wrapping the ORM by extending its `Model` class, Sudzy's `ValidModel` does validation checks whenever properties are set.
 
-Validation failures are stored, and available through `::getValidationErrors()`, a method of both the `ValidModel` object and the thrown `ValidationException`.
+Validation failures are stored, and available through `getValidationErrors()`, a method of both the `ValidModel` object and the thrown `ValidationException`. An object that fails validation throws a `ValidationException` when `save()` is attempted (default behavior). This can be changed to `::ON_SET` or `::NEVER` by setting the `throw` option:
+
+```php
+$this->setValidationOptions(
+    array('throw' => self::ON_SET)
+);
+```
 
 Future development will better separate `ValidModel` and the methods that invoke the engine, to potentially enable use cases with other ORMs or independent of an ORM.
 
