@@ -49,18 +49,17 @@ class ValidModel extends \Model
         $success = true;
         foreach ($this->_validations[$field] as $v) {
                 $checks = explode(' ', $v['validations']);
-                $localSuccess = true;
                 foreach ($checks as $check) {
                     $params = explode('|', $check);
                     $check  = array_shift($params);
 
-                    $localSuccess = $localSuccess
-                        && $this->_validator->executeOne($check, $value, $params);
+                    if ($this->_validator->executeOne($check, $value, $params)) {
+                        $success = $success && true;
+                    } else {
+                        $this->addValidationError($v['message']);
+                        $success = false;
+                    }
                 }
-                if (!$localSuccess) {
-                    $this->addValidationError($v['message']);
-                }
-                $success = $success && $localSuccess;
         }
         return $success;
     }
@@ -88,7 +87,7 @@ class ValidModel extends \Model
     ////////////////////
     // Protected methods
     protected function doValidationError() {
-        throw new ValidationException($this->_validationErrors); // TODO: Update to give option of silent failure
+        throw new \ValidationException($this->_validationErrors); // TODO: Update to give option of silent failure
     }
 
     protected function addValidationError($msg) 
