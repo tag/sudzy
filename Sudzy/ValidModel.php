@@ -51,15 +51,11 @@ class ValidModel extends \Model
                 $checks = explode(' ', $v['validations']);
                 $localSuccess = true;
                 foreach ($checks as $check) {
-$_SESSION['debug'][] = "  ...validateField : {$check}";
                     $params = explode('|', $check);
                     $check  = array_shift($params);
-$_SESSION['debug'][] = "  ...validateField : {$check} " .print_r( $params, true);
 
                     $localSuccess = $localSuccess
                         && $this->_validator->executeOne($check, $value, $params);
-$_SESSION['debug'][] = "  ...validateField : {$check} : " .($localSuccess ? 'pass' : 'fail');
-//$app->getLog()->debug("  ...validateField : {$check} : " .($localSuccess ? 'pass' : 'fail'));
                 }
                 if (!$localSuccess) {
                     $this->addValidationError($v['message']);
