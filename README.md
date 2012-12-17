@@ -50,7 +50,9 @@ class User extends \Sudzy\ValidModel
     }
 }
 ```
+
 ## Validator Methods
-+ required
-+ isEmail
-+ minLength accepts a length parameter; Implies required.
++ `required`
++ `isEmail`
++ `minLength`, accepts a length parameter: Implies required
++ `isInteger`: also valid for integer as a string

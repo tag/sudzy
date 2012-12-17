@@ -14,7 +14,8 @@ class Engine
         $this->_checks = array(
             'required'  => array($this, '_required'),
             'minLength' => array($this, '_minLength'),
-            'isEmail'   => array($this, '_isEmail')
+            'isEmail'   => array($this, '_isEmail'),
+            'isInteger'   => array($this, '_isInteger')
         );
     }
 
@@ -66,6 +67,13 @@ class Engine
     protected function _isEmail($val, $params)
     {
         return FALSE !== filter_var($val, FILTER_VALIDATE_EMAIL);
+    }
+
+    protected function _isInteger($val, $params)
+    {
+        if (!is_numeric($val)) return false;
+        $int = intval($val);
+        return (bool)is_int($int);
     }
 
     protected function _minLength($val, $params)
