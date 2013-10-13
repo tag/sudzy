@@ -1,7 +1,7 @@
 <?php
 namespace Sudzy;
 
-class ValidModel extends \Model
+abstract class ValidModel extends \Model
 {
     protected $_validator        = null;    // Reference to Sudzy validator object
     protected $_validations      = array(); // Array of validations
@@ -93,6 +93,12 @@ class ValidModel extends \Model
     * Overload save; checks if errors exist before saving
     */
     public function save() {
+        if ($this->isNew()) { //Fields populated by create() or hydrate() don't pass through set()
+            foreach( array_keys($this->_validations) as $field) {
+                $this->validateField($field, $this->$field);
+            }
+        }
+
         $errs = $this->getValidationErrors();
         if (!empty($errs))
             $this->doValidationError(self::ON_SAVE);
