@@ -73,7 +73,7 @@ class Engine
     {
         if (!is_numeric($val)) return false;
         $int = intval($val);
-        return (bool)is_int($int);
+        return $int == $val;
     }
 
     protected function _minLength($val, $params)
