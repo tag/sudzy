@@ -7,7 +7,15 @@ class ValidationException extends \Exception
     public function __construct($errs)
     {
         $this->_validationErrors = $errs;
-        parent::__construct(implode("\n", $errs));
+
+        $errs = array_map (
+            function($val) {
+                return implode("\n", $val);
+            },
+            $errs
+        );
+        $errStr = implode("\n", $errs);
+        parent::__construct($errStr);
     }
 
     public function getValidationErrors()

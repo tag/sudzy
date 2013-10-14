@@ -59,6 +59,7 @@ abstract class ValidModel extends \Model
         }
 
         $success = true;
+        unset($this->_validationErrors[$field]);
         foreach ($this->_validations[$field] as $v) {
                 $checks = explode(' ', $v['validation']);
                 foreach ($checks as $check) {
@@ -68,7 +69,7 @@ abstract class ValidModel extends \Model
                     if ($this->_validator->executeOne($check, $value, $params)) {
                         $success = $success && true;
                     } else {
-                        $this->addValidationError($v['message']);
+                        $this->addValidationError($field, $v['message']);
                         $success = false;
                     }
                 }
@@ -133,9 +134,9 @@ abstract class ValidModel extends \Model
                 throw new \ValidationException($this->_validationErrors);
     }
 
-    protected function addValidationError($msg)
+    protected function addValidationError($field, $msg)
     {
-        $this->_validationErrors[] = $msg;
+        $this->_validationErrors[$field][] = $msg;
     }
 
     /**

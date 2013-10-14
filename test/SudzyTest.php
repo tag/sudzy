@@ -103,16 +103,17 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
         $this->fail('ValidationException expected, but not raised.');
     }
 
-    // public function testSimpleAutoTableName() {
-    //     Model::factory('Simple')->find_many();
-    //     $expected = 'SELECT * FROM `simple`';
-    //     $this->assertEquals($expected, ORM::get_last_query());
-    // }
-    // 
-    // public function testFindResultSet() {
-    //     $result_set = Model::factory('BookFive')->find_result_set();
-    //     $this->assertInstanceOf('IdiormResultSet', $result_set);
-    //     $this->assertSame(count($result_set), 5);
-    // }
+    public function testValidationMessageResetOnSet() {
+        $simple = Model::factory('Simple')->create(
+            array('name'=>'Steve', 'age'=>'0')
+        );
+        $simple->addValidation('age', 'isInteger', 'Age must be an integer.');
 
+        $this->assertEmpty($simple->getValidationErrors());
+        $simple->age = null;
+        $this->assertNotEmpty($simple->getValidationErrors());
+
+        $simple->age = 25;
+        $this->assertEmpty($simple->getValidationErrors());
+    }
 }
