@@ -9,4 +9,9 @@
 
         </testsuite>
     </testsuites>
+    <filter>
+      <whitelist processUncoveredFilesFromWhitelist="true">
+        <directory suffix=".php">./Sudzy</directory>
+      </whitelist>
+    </filter>
 </phpunit>

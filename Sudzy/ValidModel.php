@@ -22,12 +22,12 @@ abstract class ValidModel extends \Model
         $this->$_validationOptions = array_merge($this->_validationOptions, $options);
     }
 
-    public function addValidation($field, $validations, $message) {
+    public function addValidation($field, $validation, $message) {
         if (!isset($this->_validations[$field])) {
             $this->_validations[$field] = array();
         }
         $this->_validations[$field][] = array(
-            'validations' => $validations,
+            'validation' => $validation,
             'message'     => $message
         );
     }
@@ -60,7 +60,7 @@ abstract class ValidModel extends \Model
 
         $success = true;
         foreach ($this->_validations[$field] as $v) {
-                $checks = explode(' ', $v['validations']);
+                $checks = explode(' ', $v['validation']);
                 foreach ($checks as $check) {
                     $params = explode('|', $check);
                     $check  = array_shift($params);
@@ -79,6 +79,11 @@ abstract class ValidModel extends \Model
     public function getValidationErrors()
     {
         return $this->_validationErrors;
+    }
+
+    public function resetValidationErrors()
+    {
+        $this->_validationErrors = array();
     }
 
     ///////////////////

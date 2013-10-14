@@ -33,17 +33,76 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
         $this->fail('ValidationException expected, but not raised.');
     }
 
+    public function testValidationIsInt() {
+        $simple = Model::factory('Simple')->find_one(1);
+        $simple->addValidation('age', 'isInteger', 'Must be a valid integer.');
+
+        $simple->age = 23;
+        $this->assertEmpty($simple->getValidationErrors());
+
+        $simple->age = '24';
+        $this->assertEmpty($simple->getValidationErrors());
+
+        $simple->age = '3.14159';
+        $this->assertNotEmpty($simple->getValidationErrors());
+
+        $simple->resetValidationErrors();
+        $this->assertEmpty($simple->getValidationErrors());
+
+        $simple->age = false;
+        $this->assertNotEmpty($simple->getValidationErrors());
+
+        $simple->resetValidationErrors();
+        $simple->age = 'orange';
+        $this->assertNotEmpty($simple->getValidationErrors());
+    }
+
     public function testValidationEmail() {
         $simple = Model::factory('Simple')->find_one(1);
         $simple->addValidation('email', 'isEmail', 'Must be a valid email.');
 
-        $this->email = 'valid@example.com';
+        $simple->email = 'valid@example.com';
         $this->assertEmpty($simple->getValidationErrors());
-        $this->email = 'invalid@^&example.com';
-        echo 'EMAIL:' . (filter_var($this->email, FILTER_VALIDATE_EMAIL)?:'false');
-        var_dump($simple->getValidationErrors());
+        $simple->email = 'invalid@@example.com';  // Incorrect email
         $this->assertNotEmpty($simple->getValidationErrors());
     }
+
+    public function testValidationMinLenth() {
+        $simple = Model::factory('Simple')->find_one(1);
+        $simple->addValidation('password', 'minLength|6', 'Must be at least 6 characters.');
+
+        $simple->password = 'password';
+        $this->assertEmpty($simple->getValidationErrors());
+        $simple->password = 'hello';  // Too short
+        $this->assertNotEmpty($simple->getValidationErrors());
+    }
+
+    public function testIncorrectValidator() {
+        $simple = Model::factory('Simple')->create();
+
+        $simple->addValidation('age', 'notAValidation', 'Error message.');
+        try{
+            $simple->age = 23;
+        } catch(InvalidArgumentException $e) {
+            return;
+        }
+        $this->fail('InvalidArgumentException expected, but not raised.');
+    }
+
+    public function testValidationOfNewModel() {
+        $simple = Model::factory('Simple')->create(
+            array('name'=>'Steve', 'age'=>'unknown')
+        );
+        $simple->addValidation('age', 'isInteger', 'Age must be an integer.');
+
+        try {
+            $simple->save();
+        } catch (ValidationException $e) {
+            return;
+        }
+        $this->fail('ValidationException expected, but not raised.');
+    }
+
     // public function testSimpleAutoTableName() {
     //     Model::factory('Simple')->find_many();
     //     $expected = 'SELECT * FROM `simple`';
