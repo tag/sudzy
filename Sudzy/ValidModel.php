@@ -33,6 +33,8 @@ abstract class ValidModel extends \Model
     }
 
     // /**
+    // * Checks, without throwing exceptions, model fields with validations
+    // *
     // * @return bool If false, running $this->doValidationError() will respond appropriately
     // */
     // public function validate()
@@ -50,7 +52,7 @@ abstract class ValidModel extends \Model
     **/
     public function validateField($field, $value)
     {
-        if (null == $this->_validator) $this->_validator = new \Sudzy\Engine(); // Is lazy setup worth it?
+        $this->setupValidationEngine();
 
         if (!isset($this->_validations[$field])) {
             return true; // No validations, return true by default
@@ -85,14 +87,16 @@ abstract class ValidModel extends \Model
     /**
     * Overload __set to call validateAndSet
     */
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         $this->validateAndSet($name, $value);
     }
 
     /**
     * Overload save; checks if errors exist before saving
     */
-    public function save() {
+    public function save()
+    {
         if ($this->isNew()) { //Fields populated by create() or hydrate() don't pass through set()
             foreach( array_keys($this->_validations) as $field) {
                 $this->validateField($field, $this->$field);
@@ -110,19 +114,21 @@ abstract class ValidModel extends \Model
     * Overload set; to call validateAndSet
     * // TODO: handle multiple sets if $name is a field=>val array
     */
-    public function set($name, $value = null) {
+    public function set($name, $value = null)
+    {
         $this->validateAndSet($name, $value);
     }
 
 
     ////////////////////
     // Protected methods
-    protected function doValidationError($context) {
+    protected function doValidationError($context)
+    {
         if ($context == $this->_validationOptions['throw'])
                 throw new \ValidationException($this->_validationErrors);
     }
 
-    protected function addValidationError($msg) 
+    protected function addValidationError($msg)
     {
         $this->_validationErrors[] = $msg;
     }
@@ -134,5 +140,10 @@ abstract class ValidModel extends \Model
     {
         if (!$this->validateField($name, $value)) $this->doValidationError(self::ON_SET);
         parent::set($name, $value);
+    }
+
+    protected function setupValidationEngine()
+    {
+        if (null == $this->_validator) $this->_validator = new \Sudzy\Engine(); // Is lazy setup worth it?
     }
 }

@@ -2,6 +2,9 @@
 
 namespace Sudzy;
 
+/**
+ * Singleton valdation engine
+ **/
 class Engine
 {
     /**
@@ -19,9 +22,9 @@ class Engine
         );
     }
 
-    public function __call($name, $args) 
+    public function __call($name, $args)
     {
-        if (!isset($this->_checks[$name])) 
+        if (!isset($this->_checks[$name]))
             throw new \InvalidArgumentException("{$name} is not a valid validation function.");
 
         $val = array_shift($args);
@@ -60,7 +63,7 @@ class Engine
     */
     public function getValidators()
     {
-        return array_keys($this->checks);
+        return array_keys($this->_checks);
     }
 
     ///// Validator methods
@@ -72,8 +75,7 @@ class Engine
     protected function _isInteger($val, $params)
     {
         if (!is_numeric($val)) return false;
-        $int = intval($val);
-        return $int == $val;
+        return intval($val) == $val;
     }
 
     protected function _minLength($val, $params)
