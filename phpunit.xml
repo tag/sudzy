@@ -1,0 +1,12 @@
+<phpunit backupGlobals="true"
+         backupStaticAttributes="false"
+         bootstrap="test/bootstrap.php"
+         cacheTokens="false"
+         colors="true">
+    <testsuites>
+        <testsuite name="Sudzy Test Suite">
+            <directory suffix="Test.php" phpVersion="5.3.0">test</directory>
+
+        </testsuite>
+    </testsuites>
+</phpunit>
