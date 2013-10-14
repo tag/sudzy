@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/tag/sudzy.png?branch=master)](https://travis-ci.org/tag/sudzy)
+
 # Sudzy
 **Currently a work-in-progress.**
 
