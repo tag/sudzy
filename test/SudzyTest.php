@@ -57,6 +57,33 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
         $this->assertNotEmpty($simple->getValidationErrors());
     }
 
+    public function testValidationIsPositiveNumber() {
+        $simple = Model::factory('Simple')->find_one(1);
+        $simple->addValidation('age', 'isPositive', 'Must be a valid positive number.');
+
+        $simple->age = 23;
+        $this->assertEmpty($simple->getValidationErrors());
+
+        $simple->age = '3.14159';
+        $this->assertEmpty($simple->getValidationErrors());
+
+        $simple->age = '.0314e2';
+        $this->assertEmpty($simple->getValidationErrors());
+
+        $simple->age = '-1';
+        $this->assertNotEmpty($simple->getValidationErrors());
+
+        $simple->resetValidationErrors();
+        $this->assertEmpty($simple->getValidationErrors());
+
+        $simple->age = false;
+        $this->assertNotEmpty($simple->getValidationErrors());
+
+        $simple->resetValidationErrors();
+        $simple->age = 'orange';
+        $this->assertNotEmpty($simple->getValidationErrors());
+    }
+
     public function testValidationEmail() {
         $simple = Model::factory('Simple')->find_one(1);
         $simple->addValidation('email', 'isEmail', 'Must be a valid email.');
