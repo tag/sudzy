@@ -101,7 +101,7 @@ New validations may be added to the engine with `addValidator()`.
 
 ```php
     // Add new validation method
-    $this->setupValidationEngine();
+    $model->setupValidationEngine();
     $engine = $model->_validator;
     $engine->addValidator(
         'passwordIsNotPassword',
