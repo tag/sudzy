@@ -35,6 +35,12 @@ abstract class ValidModel extends \Model
         );
     }
 
+    public function addValidations($field, $validators) {
+        foreach ($validators as $validation => $message) {
+            $this->addValidation($field, $validation, $message);
+        }
+    }
+
     // /**
     // * Checks, without throwing exceptions, model fields with validations
     // *
