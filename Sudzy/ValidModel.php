@@ -7,6 +7,9 @@ abstract class ValidModel extends \Model
     protected $_validations      = array(); // Array of validations
     protected $_validationErrors = array(); // Array of error messages
     protected $_validationOptions = array(
+        'indexedErrors' => false,   // If True getValidationErrors will return an array with the index
+                                    // being the field name and the value the error. If multiple errors
+                                    // are triggered for a field only the first will be kept.
         'throw' => self::ON_SAVE // One of self::ON_SET|ON_SAVE|NEVER. 
                                   //  + ON_SET throws immediately when field is set()
                                   //  + ON_SAVE throws on save()
@@ -68,7 +71,7 @@ abstract class ValidModel extends \Model
                     if ($this->_validator->executeOne($check, $value, $params)) {
                         $success = $success && true;
                     } else {
-                        $this->addValidationError($v['message']);
+                        $this->addValidationError($v['message'], $field);
                         $success = false;
                     }
                 }
@@ -133,9 +136,16 @@ abstract class ValidModel extends \Model
                 throw new \ValidationException($this->_validationErrors);
     }
 
-    protected function addValidationError($msg)
+    protected function addValidationError($msg, $field = null)
     {
-        $this->_validationErrors[] = $msg;
+        if ($this->_validationOptions['indexedErrors'] && $field !== null) {
+            // Only keep the first error found on a field
+            if (!isset($this->_validationErrors[$field])) {
+                $this->_validationErrors[$field] = $msg;
+            }
+        } else {
+            $this->_validationErrors[] = $msg;
+        }
     }
 
     /**
