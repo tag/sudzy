@@ -19,7 +19,7 @@ abstract class ValidModel extends \Model
 
     public function setValidationOptions($options)
     {
-        $this->$_validationOptions = array_merge($this->_validationOptions, $options);
+        $this->_validationOptions = array_merge($this->_validationOptions, $options);
     }
 
     public function addValidation($field, $validation, $message) {
