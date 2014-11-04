@@ -1,5 +1,5 @@
 # Sudzy [![Build Status](https://travis-ci.org/tag/sudzy.png?branch=master)](https://travis-ci.org/tag/sudzy)
-**v0.1 released.**
+**Currently a work-in-progress.**
 
 Sudzy is a collection of validator classes, currently intended for use with [Paris][paris]/[Idiorm][idiorm] (an active record ORM, often used with Slim), although it could be adapted easily.
 
@@ -71,7 +71,7 @@ $model->setValidationOptions(
 );
 ```
 
-Be careful of using `::ON_SET`, as Paris' internal `set()` method is not called when a model is built via Paris' `hydrate()` or `create()` methods. Also, `::ON_SET` tiggers the validation exception immediately, whereas `::ON_SAVE` permits validating all fields before throwing an exception.
+Be careful of using `::ON_SET`, as Paris' internal `set()` method is not called when a model is built via Paris' `hydrate()` or `create()` mehods. Also, `::ON_SET` tiggers the validation exception immediately, whereas `::ON_SAVE` permits validating all fields before throwing an exception.
 
 Regardless of the value of `throw`, validations are checked when properties are set. In the case of new models (such as one built with Paris methods `create()` or `hydrate()`), validations are also checked on save. Regardless of when exceptions are thrown (or not), errors are immediately available through `getValidationErrors()`.
 
@@ -92,7 +92,6 @@ For example, the current `isInteger` validation accepts integer strings. To enfo
             return $val != 'password';
         }
     );
-```
 
 The primary difference between `addValidator()` and `setValidator()` is that the add method throws an exception if a validator of that name already exists, while set overwrites without warning.
 
@@ -101,8 +100,7 @@ New validations may be added to the engine with `addValidator()`.
 
 ```php
     // Add new validation method
-    $model->setupValidationEngine();
-    $engine = $model->_validator;
+    $engine = $model->validator;
     $engine->addValidator(
         'passwordIsNotPassword',
         function ($val, $params) {
