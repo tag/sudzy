@@ -1,4 +1,13 @@
 # Sudzy [![Build Status](https://travis-ci.org/tag/sudzy.png?branch=master)](https://travis-ci.org/tag/sudzy)
+
+## Status of this fork
+This fork has not been merged into the primary repo, so some options available here are not available there. Be sure to
+check which version you're using to avoid getting confused by the documentation. The following items have been added here:
+
++ addValidations method, for adding multiple methods with unique strings
++ Additional Checks: isNumeric, maxLength
++ Additional Parameters: allowEmpty on isEmail
+
 **Currently a work-in-progress.**
 
 Sudzy is a collection of validator classes, currently intended for use with [Paris][paris]/[Idiorm][idiorm] (an active record ORM, often used with Slim), although it could be adapted easily.
@@ -32,6 +41,15 @@ Validations are most easily set up in a model's constructor. The `addValidation(
     // Multiple validations on the same field.
     $this->addValidation('email', 'required', 'An email address is required.');
     $this->addValidation('email', 'email',    'The provided email address is not valid.');
+
+    // Multiple Validations on the same field with a unique message for each message
+    $this->addValidations(
+        'email'
+        array(
+            'required' => 'An email address is required.',
+            'email', 'The provided email address is not valid.'
+        )
+    )
 
     // Alternative method of using mulitple validations on the same field.
     $this->addValidation('email', 'required email', 'A valid emali address is required.');
@@ -78,9 +96,12 @@ Regardless of the value of `throw`, validations are checked when properties are 
 ## Engine
 ### Validator Methods
 + `required`: Is not null or an empty string
-+ `isEmail`: Results of [PHP's filter](http://php.net/manual/en/filter.filters.validate.php) using `FILTER_VALIDATE_EMAIL`; by default, permits local and UTF hostnames, so be careful.
++ `isEmail`: Results of [PHP's filter](http://php.net/manual/en/filter.filters.validate.php) using `FILTER_VALIDATE_EMAIL`; by default, permits local and UTF hostnames, so be careful. Pass parameter `|allowEmpty` to only validate if the field is not left empty
 + `minLength`, accepts a length parameter: Implies required
++ `maxLength`, accepts a length parameter
 + `isInteger`: also valid for integer as a string
++ `isNumeric`: Results of [PHP's is_numeric](http://php.net/is_numeric)
+
 
 Validation methods may be overwritten or removed from the validation engine by using `setValidator()` and `removeValidator()` respecively.
 

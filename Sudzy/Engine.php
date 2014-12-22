@@ -73,6 +73,10 @@ class Engine
     ///// Validator methods
     protected function _isEmail($val, $params)
     {
+        $allowEmpty = array_pop($params);
+        if ($allowEmpty == 'allowEmpty' && !$this->_required($val)) {
+            return TRUE;
+        }
         return FALSE !== filter_var($val, FILTER_VALIDATE_EMAIL);
     }
 
