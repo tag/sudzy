@@ -20,7 +20,7 @@ class Engine
             'maxLength' => array($this, '_maxLength'),
             'isEmail'   => array($this, '_isEmail'),
             'isInteger' => array($this, '_isInteger'),
-            'isPositive' => array($this, '_isPositive')
+            'isPositive' => array($this, '_isPositive'),
             'isNumeric'   => array($this, '_isNumeric')
         );
     }
