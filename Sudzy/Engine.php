@@ -21,7 +21,9 @@ class Engine
             'isEmail'   => array($this, '_isEmail'),
             'isInteger' => array($this, '_isInteger'),
             'isPositive' => array($this, '_isPositive'),
-            'isNumeric'   => array($this, '_isNumeric')
+            'isNumeric'   => array($this, '_isNumeric'),
+            'minValue'   => array($this, '_minValue'),
+            'maxValue'   => array($this, '_maxValue'),
         );
     }
 
@@ -106,5 +108,17 @@ class Engine
     protected function _required($val, $params=array())
     {
         return !(($val === null) || ('' === trim($val)));
+    }
+
+    protected function _minValue($val, $params=array())
+    {
+        $value = array_shift($params);
+        return $val >= $value;
+    }
+
+    protected function _maxValue($val, $params=array())
+    {
+        $value = array_shift($params);
+        return $val <= $value;
     }
 }
