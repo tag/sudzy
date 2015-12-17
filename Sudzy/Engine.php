@@ -17,9 +17,11 @@ class Engine
         $this->_checks = array(
             'required'  => array($this, '_required'),
             'minLength' => array($this, '_minLength'),
+            'maxLength' => array($this, '_maxLength'),
             'isEmail'   => array($this, '_isEmail'),
             'isInteger' => array($this, '_isInteger'),
             'isPositive' => array($this, '_isPositive')
+            'isNumeric'   => array($this, '_isNumeric')
         );
     }
 
@@ -84,10 +86,21 @@ class Engine
         return is_numeric($val) && $val >= 0;
     }
 
+    protected function _isNumeric($val, $params)
+    {
+        return is_numeric($val);
+    }
+
     protected function _minLength($val, $params)
     {
         $len = array_shift($params);
         return strlen($val) >= $len;
+    }
+
+    protected function _maxLength($val, $params)
+    {
+        $len = array_shift($params);
+        return strlen($val) <= $len;
     }
 
     protected function _required($val, $params=array())
