@@ -10,6 +10,9 @@ class ValidationException extends \Exception
 
         $errs = array_map (
             function($val) {
+            	if (is_string($val)) {
+            		return $val;
+            	}
                 return implode("\n", $val);
             },
             $errs
