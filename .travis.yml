@@ -4,9 +4,10 @@ php:
     - '7.0'
     - '7.1'
     - hhvm
+
 before_script:
-    - pear install PHP_CodeSniffer
-    - phpenv rehash
+    - export PATH="$PATH:$HOME/.composer/vendor/bin"
+    - composer global require "squizlabs/php_codesniffer=*"
 
 install: composer install
 
