@@ -5,7 +5,7 @@ Sudzy is a collection of validator classes, currently intended for use with [Par
 
 Sudzy's `ValidModel` class decorates Paris' `Model` class. By extending `ValidModel`, your model classes gain immediate access to validations.
 
-By default the `ValidModel` will store validation errors when model properties are set (for an exising model) or a new model is saved, and throw a `ValidationException` on save if errors were encountered.
+By default the `ValidModel` will store validation errors when model properties are set (for an existing model) or a new model is saved, and throw a `ValidationException` on save if errors were encountered.
 
 [paris]: https://github.com/j4mie/paris
 [idiorm]: https://github.com/j4mie/idiorm
@@ -101,7 +101,8 @@ New validations may be added to the engine with `addValidator()`.
 
 ```php
     // Add new validation method
-    $engine = $model->validator;
+    $model->setupValidationEngine();
+    $engine = $model->_validator;
     $engine->addValidator(
         'passwordIsNotPassword',
         function ($val, $params) {

@@ -7,6 +7,9 @@ abstract class ValidModel extends \Model
     protected $_validations      = array(); // Array of validations
     protected $_validationErrors = array(); // Array of error messages
     protected $_validationOptions = array(
+        'indexedErrors' => false,   // If True getValidationErrors will return an array with the index
+                                    // being the field name and the value the error. If multiple errors
+                                    // are triggered for a field only the first will be kept.
         'throw' => self::ON_SAVE // One of self::ON_SET|ON_SAVE|NEVER. 
                                   //  + ON_SET throws immediately when field is set()
                                   //  + ON_SAVE throws on save()
@@ -19,7 +22,7 @@ abstract class ValidModel extends \Model
 
     public function setValidationOptions($options)
     {
-        $this->$_validationOptions = array_merge($this->_validationOptions, $options);
+        $this->_validationOptions = array_merge($this->_validationOptions, $options);
     }
 
     public function addValidation($field, $validation, $message) {
@@ -30,6 +33,12 @@ abstract class ValidModel extends \Model
             'validation' => $validation,
             'message'     => $message
         );
+    }
+
+    public function addValidations($field, $validators) {
+        foreach ($validators as $validation => $message) {
+            $this->addValidation($field, $validation, $message);
+        }
     }
 
     // /**
