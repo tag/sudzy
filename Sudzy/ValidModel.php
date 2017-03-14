@@ -95,7 +95,7 @@ abstract class ValidModel extends \Model
     */
     public function __set($name, $value)
     {
-        $this->validateAndSet($name, $value);
+        return $this->validateAndSet($name, $value);
     }
 
     /**
@@ -113,7 +113,7 @@ abstract class ValidModel extends \Model
         if (!empty($errs))
             $this->doValidationError(self::ON_SAVE);
 
-        parent::save();
+        return parent::save();
     }
 
     /**
@@ -122,7 +122,7 @@ abstract class ValidModel extends \Model
     */
     public function set($name, $value = null)
     {
-        $this->validateAndSet($name, $value);
+        return $this->validateAndSet($name, $value);
     }
 
 
@@ -145,7 +145,7 @@ abstract class ValidModel extends \Model
     protected function validateAndSet($name, $value)
     {
         if (!$this->validateField($name, $value)) $this->doValidationError(self::ON_SET);
-        parent::set($name, $value);
+        return parent::set($name, $value);
     }
 
     protected function setupValidationEngine()
