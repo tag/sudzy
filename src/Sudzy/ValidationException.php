@@ -11,8 +11,8 @@ class ValidationException extends \Exception
         $this->_validationExceptions = $exceptions;
         $this->_validationErrors = $errs;
 
-        $errs = array_map (
-            function($val) {
+        $errs = array_map(
+            function ($val) {
                 return implode("\n", $val);
             },
             $errs
@@ -25,7 +25,7 @@ class ValidationException extends \Exception
     {
         return $this->_validationErrors;
     }
-    
+
     public function getValidationExceptions()
     {
         return $this->_validationExceptions;

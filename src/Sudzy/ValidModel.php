@@ -8,12 +8,12 @@ abstract class ValidModel extends \Model
     protected $_validators = [];
     protected $_validationErrors = [];
     protected $_validationExceptions = [];
-    
+
     protected $_validationOptions = [
         'indexedErrors' => false,   // If True getValidationErrors will return an array with the index
-                                    // being the field name and the value an *array* of errors. 
-                                    
-        'throw' => self::VALIDATE_ON_SAVE // One of self::ON_SET|ON_SAVE|NEVER. 
+                                    // being the field name and the value an *array* of errors.
+
+        'throw' => self::VALIDATE_ON_SAVE // One of self::ON_SET|ON_SAVE|NEVER.
                                   //  + ON_SET throws immediately when field is set()
                                   //  + ON_SAVE throws on save()
                                   //  + NEVER means an exception is never thrown; check for ->getValidaionErrors()
@@ -27,12 +27,12 @@ abstract class ValidModel extends \Model
     {
         $this->_validationOptions = array_merge($this->_validationOptions, $options);
     }
-    
-    public abstract function prepareValidations();
-    
+
+    abstract public function prepareValidations();
+
     /**
      * @param string $prop Property name to be validated
-     * @param object $validator An instance of Respect\Validation\Validator 
+     * @param object $validator An instance of Respect\Validation\Validator
      */
     public function setValidation($prop, $validator)
     {
@@ -42,28 +42,29 @@ abstract class ValidModel extends \Model
             $this->_validators[$prop] = $validator;
         }
     }
-    
+
     /**
      * @param string $prop Property name to be validated
-     * @return object $validator An instance of Respect\Validation\Validator 
+     * @return object $validator An instance of Respect\Validation\Validator
      */
     public function getValidation($prop)
     {
-        return $this->_validators[$prop];
+        return isset($this->_validators[$prop]) ? $this->_validators[$prop] : null;
     }
 
     /**
     * Manually trigger validation checking
     *
-    * @return bool If passes validation, otherwise, throws Respect\Validation\Exceptions\NestedValidationException
+    * @return bool `true` if passes validation, otherwise,
+    *         throws `Respect\Validation\Exceptions\NestedValidationException`
     */
     public function validate()
     {
         if (empty($this->_validators)) {
             $this->prepareValidations();
         }
-        
-        foreach( $this->_validators as $key=>$val) {
+
+        foreach ($this->_validators as $key => $val) {
             $this->validateProperty($key, $this->$key);
         }
     }
@@ -79,7 +80,7 @@ abstract class ValidModel extends \Model
     {
         unset($this->_validationErrors[$prop]);
         unset($this->_validationExceptions[$prop]);
-        
+
         if (empty($this->_validators)) {
             $this->prepareValidations();
         }
@@ -91,17 +92,16 @@ abstract class ValidModel extends \Model
         try {
             $this->_validators[$prop]->assert($value);
         } catch (NestedValidationException $validationException) {
-
             $this->_validationErrors[$prop] = $validationException->getMessages();
             $this->_validationExceptions[]  = $validationException;
-            
+
             if (!$throw) {
                 return false;
             }
-            
+
             throw $validationException;
         }
-        
+
         return true;
     }
 
@@ -109,12 +109,12 @@ abstract class ValidModel extends \Model
     {
         return $this->_validationErrors;
     }
-    
+
     public function getValidationExceptions()
     {
         return $this->_validationExceptions;
     }
-    
+
     public function resetValidationErrors()
     {
         $this->_validationErrors = [];
@@ -169,7 +169,7 @@ abstract class ValidModel extends \Model
 
     /**
     * Overload set; to call validateAndSet
-    * @param string $name Property name 
+    * @param string $name Property name
     * @param mixed $value Property value
     */
     protected function validateAndSet($name, $value)
@@ -178,7 +178,7 @@ abstract class ValidModel extends \Model
         if (!$this->validateProperty($name, $value)) {
             $this->doValidationError(self::VALIDATE_ON_SET);
         }
-        
+
         return parent::set($name, $value);
     }
 }
