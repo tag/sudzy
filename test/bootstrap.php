@@ -1,18 +1,8 @@
 <?php
-require_once __DIR__ . '/idiorm.php';
-require_once __DIR__ . '/paris.php';
+// require_once __DIR__ . '/idiorm.php';
+// require_once __DIR__ . '/paris.php';
 
-spl_autoload_register(
-    function ($class) {
-        $path = __DIR__.DIRECTORY_SEPARATOR.'..' .DIRECTORY_SEPARATOR;
-        if ($class == 'ValidationException') {
-            require $path . 'Sudzy' .DIRECTORY_SEPARATOR. 'ValidationException.php';
-            return;
-        }
-        $path .= str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
-        if (file_exists($path)) require $path;
-    }
-);
+require     __DIR__ . '/../vendor/autoload.php';
 
 /**
  * Mock version of the PDOStatement class.
@@ -54,4 +44,10 @@ class MockPDO extends PDO {
 /**
  * Models for use during testing
  */
-class Simple extends \Sudzy\ValidModel { }
+class Simple extends \Sudzy\ValidModel { 
+    public function prepareValidations() 
+    {
+        $this->setValidation('age', \Respect\Validation\Validator::intVal());
+        
+    }
+}

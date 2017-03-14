@@ -1,4 +1,5 @@
 <?php
+use Respect\Validation\Validator as v;
 
 class SudzyTest extends PHPUnit_Framework_TestCase {
 
@@ -18,8 +19,8 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
     public function testValidationRequired() {
         $simple = Model::factory('Simple')->find_one(1);
         $this->assertNotEmpty($simple->email);
-        $simple->addValidation('email', 'required', 'An email address is required.');
-        $simple->validateField('email', $simple->email); //Initially populated with email address
+        $simple->setValidation('email', v::notEmpty() );
+        $simple->validateProperty('email', $simple->email); //Initially populated with email address
         $this->assertEmpty($simple->getValidationErrors());
 
         $simple->email = '';
@@ -27,7 +28,7 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
 
         try {
             $simple->save();
-        } catch (ValidationException $e) {
+        } catch (\Sudzy\ValidationException $e) {
             return;
         }
         $this->fail('ValidationException expected, but not raised.');
@@ -35,7 +36,9 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
 
     public function testValidationIsInt() {
         $simple = Model::factory('Simple')->find_one(1);
-        $simple->addValidation('age', 'isInteger', 'Must be a valid integer.');
+        
+        // This validation set in the Simple model
+        //$simple->setValidation('age', v::intVal());
 
         $simple->age = 23;
         $this->assertEmpty($simple->getValidationErrors());
@@ -57,9 +60,9 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
         $this->assertNotEmpty($simple->getValidationErrors());
     }
 
-    public function testValidationIsPositiveNumber() {
+    public function testValidationIsPositiveNumeric() {
         $simple = Model::factory('Simple')->find_one(1);
-        $simple->addValidation('age', 'isPositive', 'Must be a valid positive number.');
+        $simple->setValidation('age', v::numeric()->positive());
 
         $simple->age = 23;
         $this->assertEmpty($simple->getValidationErrors());
@@ -69,64 +72,55 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
 
         $simple->age = '.0314e2';
         $this->assertEmpty($simple->getValidationErrors());
-
+        
         $simple->age = '-1';
         $this->assertNotEmpty($simple->getValidationErrors());
 
+        // Reset errors
         $simple->resetValidationErrors();
         $this->assertEmpty($simple->getValidationErrors());
 
         $simple->age = false;
         $this->assertNotEmpty($simple->getValidationErrors());
-
-        $simple->resetValidationErrors();
-        $simple->age = 'orange';
-        $this->assertNotEmpty($simple->getValidationErrors());
     }
 
     public function testValidationEmail() {
         $simple = Model::factory('Simple')->find_one(1);
-        $simple->addValidation('email', 'isEmail', 'Must be a valid email.');
+        $simple->setValidation('email', v::notEmpty()->email() );
 
         $simple->email = 'valid@example.com';
         $this->assertEmpty($simple->getValidationErrors());
+        
         $simple->email = 'invalid@@example.com';  // Incorrect email
         $this->assertNotEmpty($simple->getValidationErrors());
     }
 
-    public function testValidationMinLenth() {
-        $simple = Model::factory('Simple')->find_one(1);
-        $simple->addValidation('password', 'minLength|6', 'Must be at least 6 characters.');
-
-        $simple->password = 'password';
-        $this->assertEmpty($simple->getValidationErrors());
-        $simple->password = 'hello';  // Too short
-        $this->assertNotEmpty($simple->getValidationErrors());
-    }
-
-    public function testIncorrectValidator() {
-        $simple = Model::factory('Simple')->create();
-
-        $simple->addValidation('age', 'notAValidation', 'Error message.');
-        try{
-            $simple->age = 23;
-        } catch(InvalidArgumentException $e) {
-            return;
-        }
-        $this->fail('InvalidArgumentException expected, but not raised.');
-    }
+    // TODO: permit adding a null validator to overwrite existing one
+    // public function testIncorrectValidator() {
+    //     $simple = Model::factory('Simple')->create();
+    //
+    //     $simple->addValidation('age', 'notAValidation', 'Error message.');
+    //     try{
+    //         $simple->age = 23;
+    //     } catch(InvalidArgumentException $e) {
+    //         return;
+    //     }
+    //     $this->fail('InvalidArgumentException expected, but not raised.');
+    // }
 
     public function testValidationOfNewModel() {
         $simple = Model::factory('Simple')->create(
             array('name'=>'Steve', 'age'=>'unknown')
         );
-        $simple->addValidation('age', 'isInteger', 'Age must be an integer.');
-
+        
+        // Default validation on age 
+        
         try {
             $simple->save();
-        } catch (ValidationException $e) {
+        } catch (\Sudzy\ValidationException $e) {
             return;
         }
+
         $this->fail('ValidationException expected, but not raised.');
     }
 
@@ -134,9 +128,10 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
         $simple = Model::factory('Simple')->create(
             array('name'=>'Steve', 'age'=>'0')
         );
-        $simple->addValidation('age', 'isInteger', 'Age must be an integer.');
+        $simple->setValidation('age', v::intVal()->positive());
 
         $this->assertEmpty($simple->getValidationErrors());
+
         $simple->age = null;
         $this->assertNotEmpty($simple->getValidationErrors());
 
