@@ -6,6 +6,7 @@ use Respect\Validation\Exceptions\NestedValidationException;
 abstract class ValidModel extends \Model
 {
     protected $_validators = [];
+    protected $_validatorsLoaded = false;
     protected $_validationErrors = [];
     protected $_validationExceptions = [];
 
@@ -16,7 +17,7 @@ abstract class ValidModel extends \Model
         'throw' => self::VALIDATE_ON_SAVE // One of self::ON_SET|ON_SAVE|NEVER.
                                   //  + ON_SET throws immediately when field is set()
                                   //  + ON_SAVE throws on save()
-                                  //  + NEVER means an exception is never thrown; check for ->getValidaionErrors()
+                                  //  + NEVER means an exception is never thrown; check for ->getValidationErrors()
     ];
 
     const VALIDATE_ON_SET   = 'set';
@@ -28,6 +29,11 @@ abstract class ValidModel extends \Model
         $this->_validationOptions = array_merge($this->_validationOptions, $options);
     }
 
+    public function getValidationOptions()
+    {
+        return $this->_validationOptions;
+    }
+
     abstract public function prepareValidations();
 
     /**
@@ -36,6 +42,7 @@ abstract class ValidModel extends \Model
      */
     public function setValidation($prop, $validator)
     {
+        $this->lazyLoadValidations();
         if ($validator === null) {
             unset($this->_validators[$prop]);
         } else {
@@ -49,7 +56,17 @@ abstract class ValidModel extends \Model
      */
     public function getValidation($prop)
     {
+        $this->lazyLoadValidations();
         return isset($this->_validators[$prop]) ? $this->_validators[$prop] : null;
+    }
+
+    /**
+     * @return array Arrany of Respect\Validation\Validator instances
+     */
+    public function getAllValidations()
+    {
+        $this->lazyLoadValidations();
+        return $this->_validators;
     }
 
     /**
@@ -60,10 +77,7 @@ abstract class ValidModel extends \Model
     */
     public function validate()
     {
-        if (empty($this->_validators)) {
-            $this->prepareValidations();
-        }
-
+        $this->lazyLoadValidations();
         foreach ($this->_validators as $key => $val) {
             $this->validateProperty($key, $this->$key);
         }
@@ -78,12 +92,10 @@ abstract class ValidModel extends \Model
     **/
     public function validateProperty($prop, $value, $throw = false)
     {
+        $this->lazyLoadValidations();
+
         unset($this->_validationErrors[$prop]);
         unset($this->_validationExceptions[$prop]);
-
-        if (empty($this->_validators)) {
-            $this->prepareValidations();
-        }
 
         if (!isset($this->_validators[$prop])) {
             return true; // No validations, return true by default
@@ -160,6 +172,14 @@ abstract class ValidModel extends \Model
     ////////////////////
     // Protected methods
 
+    protected function lazyLoadValidations()
+    {
+        if (!$this->_validatorsLoaded) {
+            $this->_validatorsLoaded = true;
+            $this->prepareValidations();
+        }
+    }
+
     protected function doValidationError($context)
     {
         if ($context === $this->_validationOptions['throw']) {
@@ -174,7 +194,6 @@ abstract class ValidModel extends \Model
     */
     protected function validateAndSet($name, $value)
     {
-
         if (!$this->validateProperty($name, $value)) {
             $this->doValidationError(self::VALIDATE_ON_SET);
         }

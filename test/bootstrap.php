@@ -1,6 +1,6 @@
 <?php
-// require_once __DIR__ . '/idiorm.php';
-// require_once __DIR__ . '/paris.php';
+
+date_default_timezone_set('UTC'); // Avoid ugly warnings w/ phpunit
 
 require     __DIR__ . '/../vendor/autoload.php';
 
@@ -44,10 +44,10 @@ class MockPDO extends PDO {
 /**
  * Models for use during testing
  */
-class Simple extends \Sudzy\ValidModel { 
-    public function prepareValidations() 
+class Simple extends \Sudzy\ValidModel {
+    public function prepareValidations()
     {
         $this->setValidation('age', \Respect\Validation\Validator::intVal());
-        
+
     }
 }
