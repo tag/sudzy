@@ -18,6 +18,8 @@ class Engine
             'required'  => array($this, '_required'),
             'minLength' => array($this, '_minLength'),
             'maxLength' => array($this, '_maxLength'),
+            'minValue' => array($this, '_minValue'),
+            'maxValue' => array($this, '_maxValue'),
             'isEmail'   => array($this, '_isEmail'),
             'isInteger'   => array($this, '_isInteger'),
             'isNumeric'   => array($this, '_isNumeric')
@@ -71,6 +73,10 @@ class Engine
     ///// Validator methods
     protected function _isEmail($val, $params)
     {
+        $allowEmpty = array_pop($params);
+        if ($allowEmpty == 'allowEmpty' && !$this->_required($val)) {
+            return TRUE;
+        }
         return FALSE !== filter_var($val, FILTER_VALIDATE_EMAIL);
     }
 
@@ -95,6 +101,28 @@ class Engine
     {
         $len = array_shift($params);
         return strlen($val) <= $len;
+    }
+
+    protected function _minValue($val, $params)
+    {
+        $min = array_shift($params);
+        $inclusive = array_shift($params);
+        if ($inclusive == 'inclusive') {
+            return $val >= $min;
+        } else {
+            return $val > $min;
+        }
+    }
+
+    protected function _maxLValue($val, $params)
+    {
+        $max = array_shift($params);
+        $inclusive = array_shift($params);
+        if ($inclusive == 'inclusive') {
+            return $val <= $max;
+        } else {
+            return $val < $max;
+        }
     }
 
     protected function _required($val, $params=array())

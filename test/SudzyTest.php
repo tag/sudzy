@@ -27,7 +27,7 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
 
         try {
             $simple->save();
-        } catch (ValidationException $e) {
+        } catch (\Validationexception $e) {
             return;
         }
         $this->fail('ValidationException expected, but not raised.');
@@ -97,7 +97,7 @@ class SudzyTest extends PHPUnit_Framework_TestCase {
 
         try {
             $simple->save();
-        } catch (ValidationException $e) {
+        } catch (\Validationexception $e) {
             return;
         }
         $this->fail('ValidationException expected, but not raised.');
