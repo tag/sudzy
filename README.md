@@ -106,10 +106,10 @@ New validations may be added to the engine with `addValidator()`.
     $engine->addValidator(
         'passwordIsNotPassword',
         function ($val, $params) {
-            return is_int($val);
+            return $val != 'password';
         }
     );
 
     // Use the new validation test for model fields
-    $this->addValidation('email', 'required email', 'A valid email address is required.');
+    $this->addValidation('password', 'passwordIsNotPassword', 'Don\'t use lame passwords.');
 ```

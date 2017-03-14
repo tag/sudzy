@@ -19,7 +19,9 @@ class Engine
             'minLength' => array($this, '_minLength'),
             'maxLength' => array($this, '_maxLength'),
             'isEmail'   => array($this, '_isEmail'),
-            'isInteger'   => array($this, '_isInteger'),
+
+            'isInteger' => array($this, '_isInteger'),
+            'isPositive' => array($this, '_isPositive'),
             'isNumeric'   => array($this, '_isNumeric')
         );
     }
@@ -79,6 +81,11 @@ class Engine
         if (!is_numeric($val)) return false;
         return intval($val) == $val;
     }
+
+
+    protected function _isPositive($val, $params)
+    {
+        return is_numeric($val) && $val >= 0;
 
     protected function _isNumeric($val, $params)
     {
