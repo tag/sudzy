@@ -93,7 +93,13 @@ abstract class ValidModel extends \Model
     public function validateProperty($prop, $value, $throw = false)
     {
         $this->lazyLoadValidations();
-
+        
+        // If prop is actaully an Array by using Model->set(Array), return true to prevent warnings from unset()
+        if (is_array($prop))
+        {
+            return true;
+        }
+        
         unset($this->_validationErrors[$prop]);
         unset($this->_validationExceptions[$prop]);
 
